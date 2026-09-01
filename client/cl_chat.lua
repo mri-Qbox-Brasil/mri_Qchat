@@ -104,6 +104,53 @@ AddEventHandler('chat:clear', function()
   })
 end)
 
+-- Exports de compatibilidade com o resource `chat` original (ex: o qbx_core
+-- chama exports.chat:addMessage no MOTD). Delegam pros handlers acima.
+--
+-- O `provide 'chat'` sozinho nao basta: exports() registra em mri_Qchat, e
+-- exports.chat continuaria sem achar. Registrar o handler interno
+-- __cfx_export_chat_<nome> e o que faz o export existir sob o nome `chat`
+-- (mesmo padrao do mri_Qappearance com o skinchanger).
+local function chatExport(name, fn)
+  AddEventHandler(('__cfx_export_chat_%s'):format(name), function(setCB)
+    setCB(fn)
+  end)
+end
+
+local function addMessage(data)
+  TriggerEvent('chat:addMessage', data)
+end
+
+local function addSuggestion(name, help, params)
+  TriggerEvent('chat:addSuggestion', name, help, params)
+end
+
+local function addSuggestions(suggestions)
+  TriggerEvent('chat:addSuggestions', suggestions)
+end
+
+local function removeSuggestion(name)
+  TriggerEvent('chat:removeSuggestion', name)
+end
+
+local function clear()
+  TriggerEvent('chat:clear')
+end
+
+-- Sob o nome `chat` (quem chama exports.chat:...).
+chatExport('addMessage', addMessage)
+chatExport('addSuggestion', addSuggestion)
+chatExport('addSuggestions', addSuggestions)
+chatExport('removeSuggestion', removeSuggestion)
+chatExport('clear', clear)
+
+-- E sob o nome proprio (quem chama exports.mri_Qchat:...).
+exports('addMessage', addMessage)
+exports('addSuggestion', addSuggestion)
+exports('addSuggestions', addSuggestions)
+exports('removeSuggestion', removeSuggestion)
+exports('clear', clear)
+
 -- Callbacks NUI
 RegisterNUICallback('chatResult', function(data, cb)
   chatInputActive = false

@@ -231,3 +231,38 @@ AddEventHandler('onServerResourceStart', function(resName)
         refreshCommands(player)
     end
 end)
+
+-- Exports de compatibilidade com o resource `chat` original (ex: o qbx_core
+-- chama exports.chat:addMessage nos comandos de OOC/report). No servidor a
+-- assinatura leva o target: addMessage(source, data).
+local function chatExport(name, fn)
+    AddEventHandler(('__cfx_export_chat_%s'):format(name), function(setCB)
+        setCB(fn)
+    end)
+end
+
+local function addMessage(target, data)
+    TriggerClientEvent('chat:addMessage', target, data)
+end
+
+local function addSuggestion(target, name, help, params)
+    TriggerClientEvent('chat:addSuggestion', target, name, help, params)
+end
+
+local function removeSuggestion(target, name)
+    TriggerClientEvent('chat:removeSuggestion', target, name)
+end
+
+local function clear(target)
+    TriggerClientEvent('chat:clear', target)
+end
+
+chatExport('addMessage', addMessage)
+chatExport('addSuggestion', addSuggestion)
+chatExport('removeSuggestion', removeSuggestion)
+chatExport('clear', clear)
+
+exports('addMessage', addMessage)
+exports('addSuggestion', addSuggestion)
+exports('removeSuggestion', removeSuggestion)
+exports('clear', clear)

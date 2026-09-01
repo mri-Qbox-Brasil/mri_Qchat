@@ -3,7 +3,9 @@ game 'gta5'
 
 author "MT"
 description 'MT-Chat Enhanced for qb-core'
-version '1.0.0'
+version '1.0.1'
+
+provide 'chat'
 
 ui_page "html/index.html"
 
