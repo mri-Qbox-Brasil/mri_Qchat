@@ -3,7 +3,7 @@ game 'gta5'
 
 author "MT"
 description 'MT-Chat Enhanced for qb-core'
-version '1.1.1'
+version '1.1.2'
 
 provide 'chat'
 
