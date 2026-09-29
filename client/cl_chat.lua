@@ -179,8 +179,26 @@ RegisterNUICallback('loaded', function(data, cb)
     action = 'updateAccentColor',
     accentColor = Config.UIPrimaryColor
   })
+  SendNUIMessage({
+    action = 'updateBackgroundColor',
+    backgroundColor = GetConvar('mri:backgroundColor', '')
+  })
 
   cb('ok')
+end)
+
+RegisterNUICallback('getUiConfig', function(_, cb)
+  local cfg = lib.callback.await('ox_lib:getUiConfig', false)
+  cb(type(cfg) == 'table' and cfg or false)
+end)
+
+RegisterNetEvent('ox_lib:uiConfigChanged', function(cfg)
+  if type(cfg) ~= 'table' then return end
+  SendNUIMessage({ action = 'applyUiConfig', config = cfg })
+end)
+
+RegisterNetEvent('mri_Qchat:client:backgroundColorChanged', function(newColor)
+  SendNUIMessage({ action = 'updateBackgroundColor', backgroundColor = newColor or '' })
 end)
 
 -- Broadcast: convar `mri:color` mudou no server, propaga pra NUI.

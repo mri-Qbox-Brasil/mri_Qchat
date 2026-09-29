@@ -25,7 +25,7 @@ sincronizada com a suite MRI.
 | Recurso | Obrigatório | Observação |
 |---|---|---|
 | `qbx_core` | Sim | Permissões de staff (`/staffc`, `/anuncioc`) |
-| `ox_lib` | Não | Sincronização automática da cor do tema |
+| `ox_lib` | Sim | Tema da suíte (`/adminui`) e `lib.callback` |
 
 ---
 
@@ -71,33 +71,37 @@ Os nomes dos comandos são customizáveis em `Config.Commands`.
 
 ---
 
-## Cor de destaque
+## Tema da suíte
 
-A cor de destaque da UI (bordas, botões, ícones) lê primeiro a convar global
-`mri:color`, compartilhada com toda a suite MRI (`mri_Qmultichar`, `mri_Qspawn`,
-`mri_Qadmin`, `mri_Qloadscreen`). Defina com:
+A NUI segue o tema da suíte MRI pelo `@mriqbox/ui-kit` (guia: `THEMING.md` do kit),
+junto com ox_lib, ox_inventory e mri_Qadmin, sem restart:
+
+| O que | De onde vem | Atualiza ao vivo por |
+|---|---|---|
+| Cor de destaque | convar `mri:color` | `mri_Qchat:client:accentColorChanged` |
+| Cor de fundo | convar `mri:backgroundColor` (vazio = padrão da suíte) | `mri_Qchat:client:backgroundColorChanged` |
+| Tema dark/glass, opacidade, fonte, radius, cores de status, overrides de cor | `/adminui` do ox_lib (`ox_lib:getUiConfig`) | `ox_lib:uiConfigChanged` |
 
 ```
 setr mri:color "#00E699"
 ```
 
-ou pelo painel do `mri_Qadmin`. Se a convar não estiver setada, cai no fallback
-`Config.UIPrimaryColor`. A troca em runtime é propagada automaticamente para a NUI.
+A janela do chat, a caixa de digitação, a lista de sugestões e o painel de
+configurações são superfícies do glass (`mri-surface`). O painel de
+configurações fica quase opaco pra não misturar com o chat por baixo. As cores das
+mensagens (códigos `^1`, cores por canal) são conteúdo e não seguem o tema.
 
 ---
 
-## Cores por canal
+## Canais na interface
 
-Paleta independente da cor de destaque, em `Config.Colors`:
+O canal aparece como etiqueta ao lado do nome, tirada do campo `channel` da
+mensagem ou do prefixo `[X]` do autor (prefixo numérico, do `Config.ShowID`,
+vira `#id`). As cores seguem o tema: `STAFF` na cor de erro, `ANÚNCIO` na de
+aviso, `OOC` neutra e os demais na cor de destaque. `GLOBAL` não tem etiqueta.
 
-| Canal | Padrão |
-|---|---|
-| `GLOBAL` | `#9406f9` (roxo neon) |
-| `LOCAL` | `#ffffff` (branco) |
-| `STAFF` | `#ff0000` (vermelho) |
-| `ANUNCIOS` | `#ffd700` (dourado) |
-| `OOC` | `#00ffff` (ciano) |
-| `RP` | `#ff00ff` (magenta) |
+`Config.Colors` continua indo no evento `chat:addMessage` (pra quem ouvir de
+fora), mas a interface não usa mais essas cores.
 
 ---
 
