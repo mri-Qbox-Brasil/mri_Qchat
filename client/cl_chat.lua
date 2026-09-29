@@ -188,8 +188,9 @@ RegisterNUICallback('loaded', function(data, cb)
 end)
 
 RegisterNUICallback('getUiConfig', function(_, cb)
-  local cfg = lib.callback.await('ox_lib:getUiConfig', false)
-  cb(type(cfg) == 'table' and cfg or false)
+  if GetResourceState('ox_lib') ~= 'started' then return cb(false) end
+  local ok, cfg = pcall(function() return exports.ox_lib:getUiConfig() end)
+  cb(ok and type(cfg) == 'table' and cfg or false)
 end)
 
 RegisterNetEvent('ox_lib:uiConfigChanged', function(cfg)
