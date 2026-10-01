@@ -1,5 +1,4 @@
 local chatInputActive = false
-local chatInputActivating = false
 local chatHidden = false
 local chatLoaded = false
 
@@ -211,45 +210,26 @@ RegisterNetEvent('mri_Qchat:client:accentColorChanged', function(newColor)
   })
 end)
 
--- Thread de Controle de Input
+RegisterCommand('mri_chat', function()
+  if chatInputActive then return end
+  chatInputActive = true
+  SendNUIMessage({ type = 'ON_OPEN' })
+  SetNuiFocus(true, true)
+  if Config.Debug then print("^2[mri_Qchat] Chat aberto.^7") end
+end, false)
+
+RegisterKeyMapping('mri_chat', 'Abrir o chat', 'keyboard', 't')
+
 Citizen.CreateThread(function()
   SetTextChatEnabled(false)
-  Wait(100)
 
   while true do
-    Wait(0)
-
-    if not chatInputActive then
-      if IsControlPressed(0, 245) --[[ INPUT_MP_TEXT_CHAT_ALL ]] then
-        chatInputActive = true
-        chatInputActivating = true
-
-        SendNUIMessage({
-          type = 'ON_OPEN'
-        })
-        
-        if Config.Debug then print("^5[mri_Qchat] Tentando abrir o chat...^7") end
-
-        SendNUIMessage({
-          action = 'updateAccentColor',
-          accentColor = Config.UIPrimaryColor
-        })
-
-        Wait(50) -- Pequeno delay para a UI processar a mensagem
-        SetNuiFocus(true, true) -- Foco com Teclado e Mouse
-        chatInputActivating = false
-        if Config.Debug then print("^2[mri_Qchat] Foco NUI definido com sucesso.^7") end
-      end
-    end
+    Wait(500)
 
     if chatLoaded then
-      local shouldBeHidden = false
+      local shouldBeHidden = IsScreenFadedOut() or IsPauseMenuActive()
 
-      if IsScreenFadedOut() or IsPauseMenuActive() then
-        shouldBeHidden = true
-      end
-
-      if (shouldBeHidden and not chatHidden) or (not shouldBeHidden and chatHidden) then
+      if shouldBeHidden ~= chatHidden then
         chatHidden = shouldBeHidden
 
         SendNUIMessage({
